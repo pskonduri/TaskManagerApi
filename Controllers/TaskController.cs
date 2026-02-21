@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 using TaskManagerApi.Data;
 using TaskManagerApi.Models;
+using TaskManagerApi.DTOs;
+using TaskManagerApi.Services;
 
 namespace TaskManagerApi.Controllers;
 
@@ -8,53 +11,45 @@ namespace TaskManagerApi.Controllers;
 [Route("api/[controller]")]
 public class TasksController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly ITaskService _service;
 
-    public TasksController(AppDbContext context)
+    public TasksController(ITaskService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
     public IActionResult GetAll()
     {
-        return Ok(_context.Tasks.ToList());
+        return Ok(_service.GetAll());
+    }
+
+    [HttpGet("{id}")]
+    public IActionResult GetById(int id)
+    {
+        var task = _service.GetById(id);
+        return task == null ? NotFound() : Ok(task);
     }
 
     [HttpPost]
-    public IActionResult Create(TaskItem task)
+    public IActionResult Create(TaskCreateDto dto)
     {
-        _context.Tasks.Add(task);
-        _context.SaveChanges();
-        return CreatedAtAction(nameof(GetAll), new { id = task.Id }, task);
+        var created = _service.Create(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]
-    public IActionResult Update(int id, TaskItem updated)
+    public IActionResult Update(int id, TaskUpdateDto dto)
     {
-        var task = _context.Tasks.Find(id);
-        if (task == null)
-            return NotFound();
-
-        task.Title = updated.Title;
-        task.Description = updated.Description;
-        task.IsCompleted = updated.IsCompleted;
-
-        _context.SaveChanges();
-        return NoContent();
+        var success = _service.Update(id, dto);
+        return success ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var task = _context.Tasks.Find(id);
-        if (task == null)
-            return NotFound();
-
-        _context.Tasks.Remove(task);
-        _context.SaveChanges();
-
-        return NoContent();
+        var success = _service.Delete(id);
+        return success ? NoContent() : NotFound();
     }
 }
 
