@@ -35,6 +35,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<TaskManagerApi.Middleware.ErrorHandlingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
