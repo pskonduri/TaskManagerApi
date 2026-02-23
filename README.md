@@ -30,4 +30,8 @@ dotnet ef database update
 # Install AutoMapper
 dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
 
+# Install FluentValidation
+dotnet add package FluentValidation
+dotnet add package FluentValidation.DependencyInjectionExtensions
+
 

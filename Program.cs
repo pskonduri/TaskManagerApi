@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
 using TaskManagerApi.Data;
 using TaskManagerApi.Services;
 using TaskManagerApi.Repositories;
@@ -6,6 +9,8 @@ using TaskManagerApi.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddMemoryCache();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -16,6 +21,11 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+
 
 var app = builder.Build();
 
